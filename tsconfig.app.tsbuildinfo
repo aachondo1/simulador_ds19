@@ -1,13 +1,1 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simulador Crédito Hipotecario DS19</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/Disclaimer.tsx","./src/components/Glossary.tsx","./src/components/MortgageForm.tsx","./src/components/SimulationResults.tsx","./src/services/fechaService.ts","./src/services/ufService.ts","./src/types/mortgage.ts","./src/utils/mortgageCalculator.ts"],"version":"5.9.3"}
