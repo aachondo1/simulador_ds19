@@ -23,7 +23,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
   const ejecutivo = ejecutivosData[Math.floor(Math.random() * ejecutivosData.length)];
   const formatCLP = (n: number) => '$' + n.toLocaleString('es-CL', { minimumFractionDigits: 0 });
 
-  // CAE referencial para hipotecarios (tasa efectiva + seguros ≈ +0.3-0.5%)
   const getCae = (termYears: number): string => {
     const base = inputs.useReferenceRate
       ? getReferenceRateByLoanAmount(loanAmount) * 100
@@ -31,10 +30,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
     return (base + (termYears <= 10 ? 0.48 : termYears <= 15 ? 0.42 : 0.38)).toFixed(2) + '%';
   };
 
-  /**
-   * Calcula el desglose mensual para un plazo dado.
-   * Recalcula desde cero para mostrar 3 escenarios.
-   */
   const calcDividendo = (termYears: number) => {
     const annualRate = inputs.useReferenceRate
       ? getReferenceRateByLoanAmount(loanAmount)
@@ -45,11 +40,9 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
     const factorExp = Math.pow(1 + r, n);
     const dividendoBase = loanAmount * (r * factorExp) / (factorExp - 1);
 
-    // Seguro incendio (primer mes, sobre base asegurable)
     const fireBase = inputs.propertyType === 'departamento' ? 0.80 : 0.75;
     const seguroIncendio = propertyValue * fireBase * 0.000042;
 
-    // Seguro desgravamen
     const deathMult = inputs.hasCoDebtor ? 2 : 1;
     const seguroDesgravamen = loanAmount * 0.00011 * deathMult;
 
@@ -122,7 +115,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
     <div className="bg-white rounded shadow p-6 max-w-6xl mx-auto">
       <div id="pdf-content-ds19" className="bg-white p-4">
 
-        {/* ── Encabezado ── */}
         <div className="mb-3 text-center border-b-2 border-ds19-navy pb-2">
           <h1 className="text-2xl font-bold text-ds19-navy mb-1">CRÉDITO HIPOTECARIO DS19</h1>
           <p className="text-xs text-ds19-teal font-semibold mb-2">Programa de Integración Social y Territorial — MINVU</p>
@@ -133,7 +125,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
           </div>
         </div>
 
-        {/* ── Resumen de la Operación ── */}
         <div className="mb-4 border-b-2 border-gray-300 pb-3">
           <h2 className="text-lg font-bold text-ds19-navy mb-2">Resumen de la Operación</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-700">
@@ -164,7 +155,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
           </div>
         </div>
 
-        {/* ── Tabla Dividendo Hipotecario ── */}
         <div className="mb-3">
           <h3 className="text-sm font-bold text-ds19-navy mb-2">Detalle Dividendo Hipotecario</h3>
           <div className="overflow-x-auto">
@@ -225,7 +215,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
           </div>
         </div>
 
-        {/* ── Requisitos ── */}
         <div className="mb-3">
           <h3 className="text-sm font-bold text-ds19-navy mb-2">Requisitos y Validaciones</h3>
           <div className="bg-gray-50 rounded p-2 mb-2">
@@ -299,7 +288,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
           </div>
         </div>
 
-        {/* ── Gastos Operacionales ── */}
         <div className="mb-3">
           <h3 className="text-sm font-bold text-ds19-navy mb-2">Gastos Operacionales</h3>
           <table className="w-full text-xs border-collapse max-w-2xl border border-gray-400">
@@ -331,7 +319,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
           </table>
         </div>
 
-        {/* Datos ejecutivo — solo PDF */}
         {isPdfMode && (
           <div className="mt-3 border-t-2 border-gray-300 pt-3">
             <h3 className="text-sm font-bold text-ds19-navy mb-2">Ejecutivo Comercial</h3>
@@ -345,7 +332,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
           </div>
         )}
 
-        {/* Disclaimer — solo PDF */}
         {isPdfMode && (
           <div className="mt-3 bg-gray-50 border border-ds19-navy rounded p-3 text-xs text-gray-700 leading-relaxed">
             <p className="font-bold text-ds19-navy mb-1">Información importante</p>
@@ -354,7 +340,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
         )}
       </div>
 
-      {/* Botones */}
       <div className="mt-4 flex flex-row gap-3 justify-center">
         <button
           onClick={handleGeneratePDF}

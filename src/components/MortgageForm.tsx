@@ -52,13 +52,11 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
   const [ejecutivoError, setEjecutivoError] = useState(false);
   const [autoSavings, setAutoSavings] = useState(false);
 
-  // Displays para property value y savings
   const [displayProperty, setDisplayProperty] = useState('1.800,00');
   const [displaySavings, setDisplaySavings] = useState('280,00');
   const [isPropertyFocused, setIsPropertyFocused] = useState(false);
   const [isSavingsFocused, setIsSavingsFocused] = useState(false);
 
-  // Calcular tasa automática cuando cambia el crédito
   useEffect(() => {
     if (inputs.useReferenceRate) {
       const subsidio = getSubsidyAmount(inputs.propertyValue);
@@ -70,7 +68,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
     }
   }, [inputs.propertyValue, inputs.savings, inputs.useReferenceRate]);
 
-  // Auto-calcular ahorro mínimo para 80% LTV
   useEffect(() => {
     if (autoSavings) {
       const min = getMinSavings(inputs.propertyValue);
@@ -86,7 +83,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
     }
   }, [inputs.propertyValue, autoSavings, currency, isSavingsFocused]);
 
-  // Sincronizar displays con valores internos
   useEffect(() => {
     if (!isPropertyFocused) {
       setDisplayProperty(
@@ -140,7 +136,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
     onSubmit(inputs);
   };
 
-  // Info de tramo actual
   const tramoActual = DS19_TRAMOS.find(
     t => inputs.propertyValue >= t.min && inputs.propertyValue <= t.max
   );
@@ -154,7 +149,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
         <h2 className="text-2xl font-bold text-ds19-navy">Simulador Crédito Hipotecario DS19</h2>
       </div>
 
-      {/* Moneda + Ejecutivo */}
       <div className="pb-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Moneda de ingreso:</label>
@@ -202,7 +196,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
         </div>
       </div>
 
-      {/* Tramo DS19 indicativo */}
       {tramoActual && (
         <div className="bg-ds19-lightblue border border-ds19-navy rounded-lg p-3">
           <p className="text-sm font-semibold text-ds19-navy">
@@ -212,10 +205,8 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
         </div>
       )}
 
-      {/* Grilla de inputs */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        {/* Valor Propiedad */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Valor Propiedad ({currency})
@@ -250,7 +241,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           </p>
         </div>
 
-        {/* Ahorro Propio */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Ahorro Propio / Pie ({currency})
@@ -309,7 +299,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           )}
         </div>
 
-        {/* Plazo */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Plazo (años)</label>
           <input
@@ -323,7 +312,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           />
         </div>
 
-        {/* Tasa de interés */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Tasa Anual (%)
@@ -357,7 +345,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           </label>
         </div>
 
-        {/* Renta mensual */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Renta Mensual (CLP)</label>
           <input
@@ -373,7 +360,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           />
         </div>
 
-        {/* Edad */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Edad</label>
           <input
@@ -389,7 +375,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           />
         </div>
 
-        {/* Tipo de propiedad */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Propiedad</label>
           <select
@@ -408,7 +393,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           </select>
         </div>
 
-        {/* DFL-2 */}
         <div className="flex flex-col justify-center">
           <label className="flex items-center gap-3 cursor-pointer">
             <div className="relative">
@@ -430,7 +414,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           </p>
         </div>
 
-        {/* Codeudor */}
         <div className="flex flex-col justify-center">
           <label className="flex items-center gap-3 cursor-pointer">
             <div className="relative">
