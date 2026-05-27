@@ -63,8 +63,11 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
   };
 
   const plazoMax = Math.min(40, 79 - inputs.age);
+  const plazoMid = plazoMax === inputs.term
+    ? (inputs.term === 25 ? 15 : 25)
+    : inputs.term;
   const r8 = calcDividendo(8);
-  const rSelected = calcDividendo(inputs.term);
+  const rSelected = calcDividendo(plazoMid);
   const rMax = calcDividendo(plazoMax);
 
   const gastos = [
@@ -160,7 +163,7 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                 <tr>
                   <th className="py-1 px-2 text-left border border-ds19-navy font-bold text-xs"></th>
                   <th className={colHeader}>8 años</th>
-                  <th className={colHeader}>{inputs.term} años</th>
+                  <th className={colHeader}>{plazoMid} años</th>
                   <th className={colHeader}>{plazoMax} años</th>
                 </tr>
               </thead>
@@ -228,7 +231,7 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                 <tr>
                   <th className="py-1 px-2 text-left border border-ds19-navy font-bold text-xs">Concepto</th>
                   <th className={colHeader}>8 años</th>
-                  <th className={colHeader}>{inputs.term} años</th>
+                  <th className={colHeader}>{plazoMid} años</th>
                   <th className={colHeader}>{plazoMax} años</th>
                 </tr>
               </thead>
@@ -259,7 +262,7 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                 ))}
                 <tr className="bg-gray-50">
                   <td className={colLeft}>Edad + Plazo &lt; 80</td>
-                  {[8, inputs.term, plazoMax].map(p => {
+                  {[8, plazoMid, plazoMax].map(p => {
                     const total = inputs.age + p;
                     const ok = total < 80;
                     return (
