@@ -62,10 +62,10 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
     };
   };
 
-  const plazoMedio = Math.min(Math.max(Math.round(inputs.term / 2 / 5) * 5, 10), 20);
+  const plazoMax = Math.min(40, 79 - inputs.age);
   const r8 = calcDividendo(8);
-  const rM = calcDividendo(plazoMedio);
-  const r20 = calcDividendo(20);
+  const rSelected = calcDividendo(inputs.term);
+  const rMax = calcDividendo(plazoMax);
 
   const gastos = [
     { concepto: 'Tasación', uf: result.additionalCosts.tasacion.toFixed(2), clp: Math.round(result.additionalCosts.tasacion * ufValue) },
@@ -160,52 +160,52 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                 <tr>
                   <th className="py-1 px-2 text-left border border-ds19-navy font-bold text-xs"></th>
                   <th className={colHeader}>8 años</th>
-                  <th className={colHeader}>{plazoMedio} años</th>
-                  <th className={colHeader}>20 años</th>
+                  <th className={colHeader}>{inputs.term} años</th>
+                  <th className={colHeader}>{plazoMax} años</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
                 <tr className="bg-gray-50">
                   <td className={colLeft}>Tasa Fija (%)</td>
                   <td className={colCenter}>{r8.tasa.toFixed(2)}%</td>
-                  <td className={colCenter}>{rM.tasa.toFixed(2)}%</td>
-                  <td className={colCenter}>{r20.tasa.toFixed(2)}%</td>
+                  <td className={colCenter}>{rSelected.tasa.toFixed(2)}%</td>
+                  <td className={colCenter}>{rMax.tasa.toFixed(2)}%</td>
                 </tr>
                 <tr>
                   <td className={colLeft}>Dividendo Neto (CLP)</td>
                   <td className={colCenter}>{formatCLP(r8.dividendoNetoCLP)}</td>
-                  <td className={colCenter}>{formatCLP(rM.dividendoNetoCLP)}</td>
-                  <td className={colCenter}>{formatCLP(r20.dividendoNetoCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rSelected.dividendoNetoCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rMax.dividendoNetoCLP)}</td>
                 </tr>
                 <tr className="bg-gray-50">
                   <td className={colLeft}>Seg. Incendio/Sismo (CLP)</td>
                   <td className={colCenter}>{formatCLP(r8.seguroIncendioCLP)}</td>
-                  <td className={colCenter}>{formatCLP(rM.seguroIncendioCLP)}</td>
-                  <td className={colCenter}>{formatCLP(r20.seguroIncendioCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rSelected.seguroIncendioCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rMax.seguroIncendioCLP)}</td>
                 </tr>
                 <tr>
                   <td className={colLeft}>Seg. Desgravamen (CLP)</td>
                   <td className={colCenter}>{formatCLP(r8.seguroDesgravamenCLP)}</td>
-                  <td className={colCenter}>{formatCLP(rM.seguroDesgravamenCLP)}</td>
-                  <td className={colCenter}>{formatCLP(r20.seguroDesgravamenCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rSelected.seguroDesgravamenCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rMax.seguroDesgravamenCLP)}</td>
                 </tr>
                 <tr className="bg-blue-50 font-bold">
                   <td className={colLeft}>Dividendo Total (CLP)</td>
                   <td className={colCenter}>{formatCLP(r8.dividendoTotalCLP)}</td>
-                  <td className={colCenter}>{formatCLP(rM.dividendoTotalCLP)}</td>
-                  <td className={colCenter}>{formatCLP(r20.dividendoTotalCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rSelected.dividendoTotalCLP)}</td>
+                  <td className={colCenter}>{formatCLP(rMax.dividendoTotalCLP)}</td>
                 </tr>
                 <tr className="bg-gray-50">
                   <td className={colLeft}>CAE</td>
                   <td className={colCenter}>{r8.cae}</td>
-                  <td className={colCenter}>{rM.cae}</td>
-                  <td className={colCenter}>{r20.cae}</td>
+                  <td className={colCenter}>{rSelected.cae}</td>
+                  <td className={colCenter}>{rMax.cae}</td>
                 </tr>
                 <tr className="bg-blue-50 font-bold">
                   <td className={colLeft}>Costo Total Crédito</td>
                   <td className={colCenter + ' leading-tight'}>{r8.totalCostUF} UF<br />{formatCLP(r8.totalCostCLP)}</td>
-                  <td className={colCenter + ' leading-tight'}>{rM.totalCostUF} UF<br />{formatCLP(rM.totalCostCLP)}</td>
-                  <td className={colCenter + ' leading-tight'}>{r20.totalCostUF} UF<br />{formatCLP(r20.totalCostCLP)}</td>
+                  <td className={colCenter + ' leading-tight'}>{rSelected.totalCostUF} UF<br />{formatCLP(rSelected.totalCostCLP)}</td>
+                  <td className={colCenter + ' leading-tight'}>{rMax.totalCostUF} UF<br />{formatCLP(rMax.totalCostCLP)}</td>
                 </tr>
               </tbody>
             </table>
@@ -228,17 +228,17 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                 <tr>
                   <th className="py-1 px-2 text-left border border-ds19-navy font-bold text-xs">Concepto</th>
                   <th className={colHeader}>8 años</th>
-                  <th className={colHeader}>{plazoMedio} años</th>
-                  <th className={colHeader}>20 años</th>
+                  <th className={colHeader}>{inputs.term} años</th>
+                  <th className={colHeader}>{plazoMax} años</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
                 {[
-                  { label: 'Renta Mínima (CLP)', r8v: r8.rentaMinima, rMv: rM.rentaMinima, r20v: r20.rentaMinima, check: (v: number) => inputs.monthlyIncome >= v, fmt: formatCLP },
+                  { label: 'Renta Mínima (CLP)', r8v: r8.rentaMinima, rSelectedv: rSelected.rentaMinima, rMaxv: rMax.rentaMinima, check: (v: number) => inputs.monthlyIncome >= v, fmt: formatCLP },
                 ].map(row => (
                   <tr key={row.label}>
                     <td className={colLeft}>{row.label}</td>
-                    {[row.r8v, row.rMv, row.r20v].map((v, i) => {
+                    {[row.r8v, row.rSelectedv, row.rMaxv].map((v, i) => {
                       const ok = row.check(v);
                       return (
                         <td key={i} className={colCenter}>
@@ -258,10 +258,10 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                   </tr>
                 ))}
                 <tr className="bg-gray-50">
-                  <td className={colLeft}>Edad + Plazo ≤ 80</td>
-                  {[8, plazoMedio, 20].map(p => {
+                  <td className={colLeft}>Edad + Plazo &lt; 80</td>
+                  {[8, inputs.term, plazoMax].map(p => {
                     const total = inputs.age + p;
-                    const ok = total <= 80;
+                    const ok = total < 80;
                     return (
                       <td key={p} className={colCenter}>
                         <div>{inputs.age} + {p} = {total}</div>

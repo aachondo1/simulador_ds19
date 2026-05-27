@@ -259,7 +259,7 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           <input
             type="number"
             min="5"
-            max="30"
+            max="40"
             value={inputs.term}
             onChange={e => setInputs(prev => ({ ...prev, term: parseInt(e.target.value) || 20 }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
