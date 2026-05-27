@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Home, AlertCircle } from 'lucide-react';
 import MortgageForm from './components/MortgageForm';
 import SimulationResults from './components/SimulationResults';
-import PaymentChart from './components/PaymentChart';
 import Glossary from './components/Glossary';
 import Disclaimer from './components/Disclaimer';
 import { simulateMortgage, calculateSubsidyResult } from './utils/mortgageCalculator';
@@ -109,9 +108,8 @@ function App() {
             )}
 
             {inputs && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className="mb-6">
                 <SimulationResults result={result} ufValue={ufValue} inputs={inputs} />
-                <PaymentChart result={result} termYears={inputs.term} />
               </div>
             )}
 
