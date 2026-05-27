@@ -7,22 +7,11 @@ import {
   getMinSavings,
   DS19_TRAMOS,
 } from '../utils/mortgageCalculator';
-import ejecutivosData from '../data/ejecutivos.json';
-
 interface MortgageFormProps {
   onSubmit: (inputs: MortgageInputs) => void;
   minSavings?: number;
 }
 
-interface Ejecutivo {
-  nombreCompleto: string;
-  empresa: string;
-  telefono: string;
-  celular: string;
-  email: string;
-}
-
-const ejecutivos: Ejecutivo[] = ejecutivosData;
 const UF_REFERENCE_VALUE = 39500;
 
 const formatCL = (value: number, isCLP: boolean): string =>
@@ -48,8 +37,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
   });
 
   const [currency, setCurrency] = useState<'UF' | 'CLP'>('UF');
-  const [selectedEjecutivo, setSelectedEjecutivo] = useState<Ejecutivo | null>(null);
-  const [ejecutivoError, setEjecutivoError] = useState(false);
   const [autoSavings, setAutoSavings] = useState(false);
 
   const [displayProperty, setDisplayProperty] = useState('1.800,00');
@@ -128,11 +115,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedEjecutivo) {
-      setEjecutivoError(true);
-      return;
-    }
-    setEjecutivoError(false);
     onSubmit(inputs);
   };
 
@@ -149,50 +131,23 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
         <h2 className="text-2xl font-bold text-ds19-navy">Simulador Crédito Hipotecario DS19</h2>
       </div>
 
-      <div className="pb-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Moneda de ingreso:</label>
-          <div className="flex gap-2">
-            {(['UF', 'CLP'] as const).map(c => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => handleCurrencyToggle(c)}
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                  currency === c
-                    ? 'bg-ds19-navy text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Ejecutivo Comercial: <span className="text-red-600">*</span>
-          </label>
-          <select
-            value={selectedEjecutivo?.nombreCompleto ?? ''}
-            onChange={e => {
-              const ej = ejecutivos.find(a => a.nombreCompleto === e.target.value);
-              setSelectedEjecutivo(ej ?? null);
-              if (ej) setEjecutivoError(false);
-            }}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy ${
-              ejecutivoError ? 'border-red-500' : 'border-gray-300'
-            }`}
-          >
-            <option value="">Seleccione un ejecutivo</option>
-            {ejecutivos.map((ej, i) => (
-              <option key={i} value={ej.nombreCompleto}>{ej.nombreCompleto}</option>
-            ))}
-          </select>
-          {ejecutivoError && (
-            <p className="text-xs text-red-600 mt-1">Debes seleccionar un ejecutivo comercial</p>
-          )}
+      <div className="pb-4 border-b border-gray-200">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Moneda de ingreso:</label>
+        <div className="flex gap-2">
+          {(['UF', 'CLP'] as const).map(c => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => handleCurrencyToggle(c)}
+              className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                currency === c
+                  ? 'bg-ds19-navy text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {c}
+            </button>
+          ))}
         </div>
       </div>
 

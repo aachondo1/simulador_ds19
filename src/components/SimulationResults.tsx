@@ -3,7 +3,6 @@ import { FileDown } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import type { SimulationResult, MortgageInputs } from '../types/mortgage';
-import ejecutivosData from '../data/ejecutivos.json';
 import { getReferenceRateByLoanAmount } from '../utils/mortgageCalculator';
 
 interface SimulationResultsProps {
@@ -20,7 +19,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
   const subsidio = result.subsidy.subsidyAmount;
   const savings = inputs.savings;
 
-  const ejecutivo = ejecutivosData[Math.floor(Math.random() * ejecutivosData.length)];
   const formatCLP = (n: number) => '$' + n.toLocaleString('es-CL', { minimumFractionDigits: 0 });
 
   const getCae = (termYears: number): string => {
@@ -118,10 +116,9 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
         <div className="mb-3 text-center border-b-2 border-ds19-navy pb-2">
           <h1 className="text-2xl font-bold text-ds19-navy mb-1">CRÉDITO HIPOTECARIO DS19</h1>
           <p className="text-xs text-ds19-teal font-semibold mb-2">Programa de Integración Social y Territorial — MINVU</p>
-          <div className="grid grid-cols-3 gap-2 text-xs text-gray-700">
+          <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
             <div><span className="font-semibold">Fecha:</span> {new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
             <div><span className="font-semibold">Valor UF:</span> ${ufValue.toLocaleString('es-CL')} CLP</div>
-            <div><span className="font-semibold">Ejecutivo:</span> {ejecutivo?.nombreCompleto}</div>
           </div>
         </div>
 
@@ -318,19 +315,6 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
             </tbody>
           </table>
         </div>
-
-        {isPdfMode && (
-          <div className="mt-3 border-t-2 border-gray-300 pt-3">
-            <h3 className="text-sm font-bold text-ds19-navy mb-2">Ejecutivo Comercial</h3>
-            <div className="bg-gray-50 rounded p-2 grid grid-cols-2 gap-2 text-xs text-gray-700">
-              <div><span className="font-semibold">Nombre:</span> {ejecutivo?.nombreCompleto}</div>
-              <div><span className="font-semibold">Empresa:</span> {ejecutivo?.empresa}</div>
-              <div><span className="font-semibold">Teléfono:</span> {ejecutivo?.telefono}</div>
-              <div><span className="font-semibold">Celular:</span> {ejecutivo?.celular}</div>
-              <div className="col-span-2"><span className="font-semibold">Email:</span> {ejecutivo?.email}</div>
-            </div>
-          </div>
-        )}
 
         {isPdfMode && (
           <div className="mt-3 bg-gray-50 border border-ds19-navy rounded p-3 text-xs text-gray-700 leading-relaxed">
