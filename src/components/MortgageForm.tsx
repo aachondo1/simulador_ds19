@@ -261,7 +261,7 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           <label className="block text-sm font-medium text-gray-700 mb-1">Sueldo Líquido Fijo (CLP)</label>
           <input
             type="number"
-            step="10000"
+            step="1"
             min="0"
             value={fixedSalary}
             onChange={e => setFixedSalary(parseFloat(e.target.value) || 0)}
@@ -274,7 +274,7 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           <label className="block text-sm font-medium text-gray-700 mb-1">Sueldo Líquido Variable (CLP)</label>
           <input
             type="number"
-            step="10000"
+            step="1"
             min="0"
             value={variableSalary}
             onChange={e => setVariableSalary(parseFloat(e.target.value) || 0)}
