@@ -46,7 +46,7 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
 
     const dividendoTotal = dividendoBase + seguroIncendio + seguroDesgravamen;
     const costoTotal = dividendoTotal * n;
-    const rentaMinima = Math.round((dividendoTotal / 0.25) * ufValue);
+    const rentaMinima = Math.round((dividendoTotal / 0.40) * ufValue);
 
     return {
       tasa: annualRate * 100,

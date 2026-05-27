@@ -190,7 +190,7 @@ export function simulateMortgage(
     monthlyPayment,
     additionalCosts,
     totalFinanced: propertyValue,
-    isAffordable: affordabilityPercentage <= 25,
+    isAffordable: affordabilityPercentage <= 40,
     affordabilityPercentage: Math.round(affordabilityPercentage * 100) / 100,
   };
 }
