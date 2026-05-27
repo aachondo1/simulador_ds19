@@ -1,0 +1,44 @@
+const UF_API_URL = 'https://mindicador.cl/api';
+const UF_STORAGE_KEY = 'uf_data_ds19';
+const DEFAULT_UF_VALUE = 39500;
+
+interface UFData {
+  valor: number;
+  fecha: string;
+}
+
+interface MindicadorResponse {
+  uf: {
+    valor: number;
+  };
+}
+
+export async function fetchUFValue(): Promise<number> {
+  try {
+    const response = await fetch(UF_API_URL);
+    if (!response.ok) throw new Error('API request failed');
+    const data: MindicadorResponse = await response.json();
+    return data.uf.valor;
+  } catch (error) {
+    console.error('Error fetching UF value:', error);
+    throw error;
+  }
+}
+
+export async function getUFValue(): Promise<number> {
+  try {
+    const storedData = localStorage.getItem(UF_STORAGE_KEY);
+    const today = new Date().toISOString().split('T')[0];
+
+    if (storedData) {
+      const ufData: UFData = JSON.parse(storedData);
+      if (ufData.fecha === today) return ufData.valor;
+    }
+
+    const valor = await fetchUFValue();
+    localStorage.setItem(UF_STORAGE_KEY, JSON.stringify({ valor, fecha: today }));
+    return valor;
+  } catch {
+    return DEFAULT_UF_VALUE;
+  }
+}
