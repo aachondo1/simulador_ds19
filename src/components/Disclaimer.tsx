@@ -1,0 +1,21 @@
+import { AlertCircle } from 'lucide-react';
+
+export default function Disclaimer() {
+  return (
+    <div className="bg-amber-50 border border-amber-300 rounded-lg p-4">
+      <div className="flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold text-amber-900 mb-1 text-sm">Aviso Legal — Simulación Referencial</h4>
+          <ul className="text-xs text-amber-800 space-y-1 list-disc list-inside">
+            <li>Esta herramienta es solo demostrativa. Los valores son referenciales y no constituyen una oferta vinculante.</li>
+            <li>Las tasas de interés indicadas son valores de mercado de referencia; la tasa real la determina el banco según evaluación crediticia.</li>
+            <li>El subsidio DS19 requiere postulación y aprobación por parte de MINVU/SERVIU. No toda familia que simule califica para el subsidio.</li>
+            <li>Los montos de seguros son estimativos. Cada institución financiera tiene sus propias tarifas.</li>
+            <li>Para información oficial, visita <strong>minvu.gob.cl</strong> o contacta tu SERVIU regional.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}

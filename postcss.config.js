@@ -1,23 +1,6 @@
-[
-  {
-    "nombreCompleto": "Carla González Valdés",
-    "empresa": "Gestores Chile",
-    "telefono": "222345678",
-    "celular": "+56 9 87654321",
-    "email": "carla@gchile.cl"
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
   },
-  {
-    "nombreCompleto": "Cecilia Lillo",
-    "empresa": "Casanuestra",
-    "telefono": "223456789",
-    "celular": "+56 9 12345678",
-    "email": "cecilia@casanuestra.cl"
-  },
-  {
-    "nombreCompleto": "Daniela Allende",
-    "empresa": "Casanuestra",
-    "telefono": "222345678",
-    "celular": "+56 9 87654321",
-    "email": "daniela@casanuestra.cl"
-  }
-]
+};
