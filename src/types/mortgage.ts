@@ -2,13 +2,11 @@ export interface MortgageInputs {
   propertyValue: number;        // Valor propiedad en UF
   savings: number;              // Ahorro propio (pie) en UF
   term: number;                 // Plazo en años
-  annualRate: number;           // Tasa anual (como decimal, ej: 0.055 para 5.5%)
-  monthlyIncome: number;        // Renta mensual en CLP
+  monthlyIncome: number;        // Renta declarada mensual en CLP
   age: number;                  // Edad del solicitante
   propertyType: 'casa' | 'departamento' | 'otro';
   hasCoDebtor: boolean;         // ¿Presenta codeudor?
   isDFL2: boolean;              // ¿Primera vivienda DFL-2? (exento impuesto timbres)
-  useReferenceRate: boolean;    // ¿Usar tasa referencial automática?
 }
 
 export interface DS19Tramo {
