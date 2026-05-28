@@ -279,6 +279,22 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                     </span>
                   </td>
                 </tr>
+                <tr className="bg-gray-50">
+                  <td className={colLeft}>Continuidad Laboral (mismo empleador)</td>
+                  <td className={colCenter + ' text-center'} colSpan={3}>
+                    <span className={`font-semibold ${inputs.continuidadLaboral ? 'text-green-600' : 'text-red-600'}`}>
+                      {inputs.continuidadLaboral ? '✓ Cumple (≥ 6 meses)' : '✗ No cumple (< 6 meses)'}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className={colLeft}>Antigüedad Laboral</td>
+                  <td className={colCenter + ' text-center'} colSpan={3}>
+                    <span className={`font-semibold ${inputs.antiguedadLaboral ? 'text-green-600' : 'text-red-600'}`}>
+                      {inputs.antiguedadLaboral ? '✓ Cumple (≥ 1 año)' : '✗ No cumple (< 1 año)'}
+                    </span>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>

@@ -7,6 +7,8 @@ export interface MortgageInputs {
   propertyType: 'casa' | 'departamento' | 'otro';
   hasCoDebtor: boolean;         // ¿Presenta codeudor?
   isDFL2: boolean;              // ¿Primera vivienda DFL-2? (exento impuesto timbres)
+  continuidadLaboral: boolean;  // true = ≥ 6 meses con el mismo empleador
+  antiguedadLaboral: boolean;   // true = ≥ 12 meses trabajando
 }
 
 export interface DS19Tramo {

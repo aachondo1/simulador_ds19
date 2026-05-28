@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calculator } from 'lucide-react';
+import { Calculator, Info } from 'lucide-react';
 import type { MortgageInputs } from '../types/mortgage';
 import {
   getMinSavings,
@@ -30,6 +30,8 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
     propertyType: 'departamento',
     hasCoDebtor: false,
     isDFL2: true,
+    continuidadLaboral: false,
+    antiguedadLaboral: false,
   });
 
   const [fixedSalary, setFixedSalary] = useState(2000000);
@@ -300,6 +302,46 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
             required
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+            Continuidad Laboral
+            <div className="relative group inline-flex items-center cursor-help">
+              <Info className="w-3.5 h-3.5 text-gray-400" />
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
+                Tiempo trabajando para el mismo empleador
+              </span>
+            </div>
+          </label>
+          <select
+            value={inputs.continuidadLaboral ? 'si' : 'no'}
+            onChange={e => setInputs(prev => ({ ...prev, continuidadLaboral: e.target.value === 'si' }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+          >
+            <option value="no">Menos de 6 meses</option>
+            <option value="si">6 meses o más</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+            Antigüedad Laboral
+            <div className="relative group inline-flex items-center cursor-help">
+              <Info className="w-3.5 h-3.5 text-gray-400" />
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
+                Tiempo trabajando
+              </span>
+            </div>
+          </label>
+          <select
+            value={inputs.antiguedadLaboral ? 'si' : 'no'}
+            onChange={e => setInputs(prev => ({ ...prev, antiguedadLaboral: e.target.value === 'si' }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+          >
+            <option value="no">Menos de 1 año</option>
+            <option value="si">1 año o más</option>
+          </select>
         </div>
 
         <div>
