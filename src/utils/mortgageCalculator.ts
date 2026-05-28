@@ -52,12 +52,7 @@ const FIXED_COSTS_UF = {
   notaria: 3.50,
 };
 
-const REFERENCE_RATE_BRACKETS = [
-  { min: 0,       max: 599.99,   rate: 0.058 },
-  { min: 600,     max: 999.99,   rate: 0.056 },
-  { min: 1000,    max: 1799.99,  rate: 0.054 },
-  { min: 1800,    max: Infinity, rate: 0.052 },
-];
+const FIXED_ANNUAL_RATE = 0.057;
 
 // ─── Funciones exportadas ──────────────────────────────────────────────
 
@@ -86,10 +81,6 @@ export function calculateSubsidyResult(propertyValueUF: number): SubsidyResult {
   return { subsidyAmount, minSavings, maxLoan, ltv: MAX_LTV, tramo };
 }
 
-export function getReferenceRateByLoanAmount(loanUF: number): number {
-  const bracket = REFERENCE_RATE_BRACKETS.find(b => loanUF >= b.min && loanUF <= b.max);
-  return bracket ? bracket.rate : REFERENCE_RATE_BRACKETS[REFERENCE_RATE_BRACKETS.length - 1].rate;
-}
 
 export function calculateMonthlyPayment(
   loanUF: number,
@@ -155,7 +146,7 @@ export function simulateMortgage(
   inputs: MortgageInputs,
   ufValueCLP: number
 ): SimulationResult | null {
-  const { propertyValue, savings, term, monthlyIncome, isDFL2, useReferenceRate } = inputs;
+  const { propertyValue, savings, term, monthlyIncome, isDFL2 } = inputs;
 
   if (propertyValue > MAX_PROPERTY_UF) return null;
 
@@ -165,9 +156,7 @@ export function simulateMortgage(
   if (loanAmount < MIN_LOAN_UF) return null;
   if (loanAmount > subsidyResult.maxLoan) return null;
 
-  const effectiveRate = useReferenceRate
-    ? getReferenceRateByLoanAmount(loanAmount)
-    : inputs.annualRate / 100;
+  const effectiveRate = FIXED_ANNUAL_RATE;
 
   const monthlyPayment = calculateMonthlyPayment(
     loanAmount,

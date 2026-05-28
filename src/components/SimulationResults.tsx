@@ -3,7 +3,6 @@ import { FileDown } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import type { SimulationResult, MortgageInputs } from '../types/mortgage';
-import { getReferenceRateByLoanAmount } from '../utils/mortgageCalculator';
 
 interface SimulationResultsProps {
   result: SimulationResult;
@@ -21,17 +20,14 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
 
   const formatCLP = (n: number) => '$' + n.toLocaleString('es-CL', { minimumFractionDigits: 0 });
 
+  const FIXED_RATE_PCT = 5.7;
+
   const getCae = (termYears: number): string => {
-    const base = inputs.useReferenceRate
-      ? getReferenceRateByLoanAmount(loanAmount) * 100
-      : inputs.annualRate;
-    return (base + (termYears <= 10 ? 0.48 : termYears <= 15 ? 0.42 : 0.38)).toFixed(2) + '%';
+    return (FIXED_RATE_PCT + (termYears <= 10 ? 0.48 : termYears <= 15 ? 0.42 : 0.38)).toFixed(2) + '%';
   };
 
   const calcDividendo = (termYears: number) => {
-    const annualRate = inputs.useReferenceRate
-      ? getReferenceRateByLoanAmount(loanAmount)
-      : inputs.annualRate / 100;
+    const annualRate = 0.057;
 
     const r = annualRate / 12;
     const n = termYears * 12;
@@ -280,6 +276,22 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
                   <td className={colCenter + ' text-center'} colSpan={3}>
                     <span className={`font-semibold ${inputs.age <= 65 ? 'text-green-600' : 'text-red-600'}`}>
                       {inputs.age} años — {inputs.age <= 65 ? '✓ Cumple' : '✗ No cumple'}
+                    </span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className={colLeft}>Continuidad Laboral (mismo empleador)</td>
+                  <td className={colCenter + ' text-center'} colSpan={3}>
+                    <span className={`font-semibold ${inputs.continuidadLaboral ? 'text-green-600' : 'text-red-600'}`}>
+                      {inputs.continuidadLaboral ? '✓ Cumple (≥ 6 meses)' : '✗ No cumple (< 6 meses)'}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className={colLeft}>Antigüedad Laboral</td>
+                  <td className={colCenter + ' text-center'} colSpan={3}>
+                    <span className={`font-semibold ${inputs.antiguedadLaboral ? 'text-green-600' : 'text-red-600'}`}>
+                      {inputs.antiguedadLaboral ? '✓ Cumple (≥ 1 año)' : '✗ No cumple (< 1 año)'}
                     </span>
                   </td>
                 </tr>

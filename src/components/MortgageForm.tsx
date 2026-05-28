@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Calculator } from 'lucide-react';
+import { Calculator, Info } from 'lucide-react';
 import type { MortgageInputs } from '../types/mortgage';
 import {
-  getReferenceRateByLoanAmount,
-  getSubsidyAmount,
   getMinSavings,
   DS19_TRAMOS,
 } from '../utils/mortgageCalculator';
@@ -27,14 +25,17 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
     propertyValue: 1800,
     savings: 280,
     term: 20,
-    annualRate: 5.4,
     monthlyIncome: 2000000,
     age: 35,
     propertyType: 'departamento',
     hasCoDebtor: false,
     isDFL2: true,
-    useReferenceRate: true,
+    continuidadLaboral: false,
+    antiguedadLaboral: false,
   });
+
+  const [fixedSalary, setFixedSalary] = useState(2000000);
+  const [variableSalary, setVariableSalary] = useState(0);
 
   const [currency, setCurrency] = useState<'UF' | 'CLP'>('UF');
   const [autoSavings, setAutoSavings] = useState(false);
@@ -43,17 +44,6 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
   const [displaySavings, setDisplaySavings] = useState('280,00');
   const [isPropertyFocused, setIsPropertyFocused] = useState(false);
   const [isSavingsFocused, setIsSavingsFocused] = useState(false);
-
-  useEffect(() => {
-    if (inputs.useReferenceRate) {
-      const subsidio = getSubsidyAmount(inputs.propertyValue);
-      const loanEstimate = inputs.propertyValue - inputs.savings - subsidio;
-      if (loanEstimate > 0) {
-        const rate = getReferenceRateByLoanAmount(loanEstimate) * 100;
-        setInputs(prev => ({ ...prev, annualRate: rate }));
-      }
-    }
-  }, [inputs.propertyValue, inputs.savings, inputs.useReferenceRate]);
 
   useEffect(() => {
     if (autoSavings) {
@@ -113,9 +103,11 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
     setInputs(prev => ({ ...prev, savings: uf }));
   };
 
+  const monthlyIncome = fixedSalary + Math.round(variableSalary * 0.85);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(inputs);
+    onSubmit({ ...inputs, monthlyIncome });
   };
 
   const tramoActual = DS19_TRAMOS.find(
@@ -268,51 +260,33 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Tasa Anual (%)
-            {inputs.useReferenceRate && (
-              <span className="ml-2 text-xs text-ds19-green font-normal">— referencial automática</span>
-            )}
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sueldo Líquido Fijo (CLP)</label>
           <input
             type="number"
-            step="0.01"
-            min="1"
-            max="20"
-            value={inputs.annualRate.toFixed(2)}
-            onChange={e =>
-              setInputs(prev => ({ ...prev, annualRate: parseFloat(e.target.value) || 5.5 }))
-            }
-            disabled={inputs.useReferenceRate}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy disabled:bg-gray-100"
-            required
-          />
-          <label className="flex items-center gap-2 cursor-pointer mt-1">
-            <input
-              type="checkbox"
-              checked={inputs.useReferenceRate}
-              onChange={e =>
-                setInputs(prev => ({ ...prev, useReferenceRate: e.target.checked }))
-              }
-              className="w-4 h-4 rounded"
-            />
-            <span className="text-xs text-gray-700">Usar tasa referencial de mercado</span>
-          </label>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Renta Mensual (CLP)</label>
-          <input
-            type="number"
-            step="10000"
+            step="1"
             min="0"
-            value={inputs.monthlyIncome}
-            onChange={e =>
-              setInputs(prev => ({ ...prev, monthlyIncome: parseFloat(e.target.value) || 0 }))
-            }
+            value={fixedSalary}
+            onChange={e => setFixedSalary(parseFloat(e.target.value) || 0)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
             required
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sueldo Líquido Variable (CLP)</label>
+          <input
+            type="number"
+            step="1"
+            min="0"
+            value={variableSalary}
+            onChange={e => setVariableSalary(parseFloat(e.target.value) || 0)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+          />
+          <p className="text-xs text-gray-500 mt-1">Se considera el 85% (penalización 15%)</p>
+          <div className="mt-2 p-2 bg-ds19-lightblue border border-ds19-navy rounded text-xs text-ds19-navy">
+            <span className="font-semibold">Renta Declarada: </span>
+            ${monthlyIncome.toLocaleString('es-CL')} CLP
+          </div>
         </div>
 
         <div>
@@ -328,6 +302,46 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
             required
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+            Continuidad Laboral
+            <div className="relative group inline-flex items-center cursor-help">
+              <Info className="w-3.5 h-3.5 text-gray-400" />
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
+                Tiempo trabajando para el mismo empleador
+              </span>
+            </div>
+          </label>
+          <select
+            value={inputs.continuidadLaboral ? 'si' : 'no'}
+            onChange={e => setInputs(prev => ({ ...prev, continuidadLaboral: e.target.value === 'si' }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+          >
+            <option value="no">Menos de 6 meses</option>
+            <option value="si">6 meses o más</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+            Antigüedad Laboral
+            <div className="relative group inline-flex items-center cursor-help">
+              <Info className="w-3.5 h-3.5 text-gray-400" />
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
+                Tiempo trabajando
+              </span>
+            </div>
+          </label>
+          <select
+            value={inputs.antiguedadLaboral ? 'si' : 'no'}
+            onChange={e => setInputs(prev => ({ ...prev, antiguedadLaboral: e.target.value === 'si' }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+          >
+            <option value="no">Menos de 1 año</option>
+            <option value="si">1 año o más</option>
+          </select>
         </div>
 
         <div>
