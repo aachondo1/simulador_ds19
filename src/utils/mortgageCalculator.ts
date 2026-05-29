@@ -115,6 +115,28 @@ export function calculateMonthlyPayment(
   };
 }
 
+export function calculateCAE(
+  loanAmount: number,
+  additionalCostsTotal: number,
+  monthlyPaymentTotalUF: number,
+  termYears: number
+): number {
+  const netLoan = loanAmount - additionalCostsTotal;
+  const n = termYears * 12;
+
+  let low = 0.00001;
+  let high = 0.1;
+  for (let i = 0; i < 200; i++) {
+    const mid = (low + high) / 2;
+    const factorExp = Math.pow(1 + mid, n);
+    const pv = monthlyPaymentTotalUF * (factorExp - 1) / (mid * factorExp);
+    if (pv > netLoan) low = mid;
+    else high = mid;
+  }
+  const monthlyRate = (low + high) / 2;
+  return (Math.pow(1 + monthlyRate, 12) - 1) * 100;
+}
+
 export function calculateAdditionalCosts(
   propertyValueUF: number,
   loanUF: number,

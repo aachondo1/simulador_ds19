@@ -3,6 +3,7 @@ import { FileDown } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import type { SimulationResult, MortgageInputs } from '../types/mortgage';
+import { calculateCAE } from '../utils/mortgageCalculator';
 
 interface SimulationResultsProps {
   result: SimulationResult;
@@ -20,14 +21,8 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
 
   const formatCLP = (n: number) => '$' + n.toLocaleString('es-CL', { minimumFractionDigits: 0 });
 
-  const FIXED_RATE_PCT = 5.7;
-
-  const getCae = (termYears: number): string => {
-    return (FIXED_RATE_PCT + (termYears <= 10 ? 0.48 : termYears <= 15 ? 0.42 : 0.38)).toFixed(2) + '%';
-  };
-
   const calcDividendo = (termYears: number) => {
-    const annualRate = 0.057;
+    const annualRate = result.effectiveRate;
 
     const r = annualRate / 12;
     const n = termYears * 12;
@@ -44,6 +39,8 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
     const costoTotal = dividendoTotal * n;
     const rentaMinima = Math.round((dividendoTotal / 0.40) * ufValue);
 
+    const caeValue = calculateCAE(loanAmount, result.additionalCosts.total, dividendoTotal, termYears);
+
     return {
       tasa: annualRate * 100,
       dividendoNetoCLP: Math.round(dividendoBase * ufValue),
@@ -51,7 +48,7 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
       seguroDesgravamenCLP: Math.round(seguroDesgravamen * ufValue),
       dividendoTotalCLP: Math.round(dividendoTotal * ufValue),
       dividendoTotalUF: dividendoTotal,
-      cae: getCae(termYears),
+      cae: caeValue.toFixed(2) + '%',
       totalCostUF: costoTotal.toFixed(2),
       totalCostCLP: Math.round(costoTotal * ufValue),
       rentaMinima,
