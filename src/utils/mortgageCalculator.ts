@@ -43,8 +43,6 @@ const DEATH_INSURANCE_MONTHLY_RATE = 0.00011;
 const FIRE_INSURANCE_MONTHLY_RATE = 0.000042;
 const FIRE_BASE_CASA = 0.75;
 const FIRE_BASE_DEPTO = 0.80;
-const MORTGAGE_TAX_RATE = 0.008;
-
 const FIXED_COSTS_UF = {
   tasacion: 2.98,
   estudioTitulos: 3.50,
@@ -53,6 +51,10 @@ const FIXED_COSTS_UF = {
 };
 
 const FIXED_ANNUAL_RATE = 0.057;
+const HIGH_LOAN_RATE = 0.0559;   // 5.59% para créditos > 2.000 UF
+const HIGH_LOAN_THRESHOLD = 2000;
+const SOCIAL_HOUSING_TAX_RATE = 0;       // Vivienda social: exento
+const STANDARD_MORTGAGE_TAX_RATE = 0.002; // No vivienda social: 0.2%
 
 // ─── Funciones exportadas ──────────────────────────────────────────────
 
@@ -140,10 +142,11 @@ export function calculateCAE(
 export function calculateAdditionalCosts(
   propertyValueUF: number,
   loanUF: number,
-  isDFL2: boolean = true
+  isSocialHousing: boolean = false
 ): AdditionalCosts {
   const cbr = propertyValueUF * 0.008;
-  const mortgageTax = isDFL2 ? 0 : loanUF * MORTGAGE_TAX_RATE;
+  const taxRate = isSocialHousing ? SOCIAL_HOUSING_TAX_RATE : STANDARD_MORTGAGE_TAX_RATE;
+  const mortgageTax = loanUF * taxRate;
 
   const subtotal =
     FIXED_COSTS_UF.tasacion +
@@ -168,17 +171,19 @@ export function simulateMortgage(
   inputs: MortgageInputs,
   ufValueCLP: number
 ): SimulationResult | null {
-  const { propertyValue, savings, term, monthlyIncome, isDFL2 } = inputs;
+  const { propertyValue, savings, subsidy, term, monthlyIncome, isSocialHousing } = inputs;
 
   if (propertyValue > MAX_PROPERTY_UF) return null;
 
-  const subsidyResult = calculateSubsidyResult(propertyValue);
-  const loanAmount = propertyValue - savings - subsidyResult.subsidyAmount;
+  const baseSubsidyResult = calculateSubsidyResult(propertyValue);
+  const subsidyResult = { ...baseSubsidyResult, subsidyAmount: subsidy };
+
+  const loanAmount = propertyValue - savings - subsidy;
 
   if (loanAmount < MIN_LOAN_UF) return null;
   if (loanAmount > subsidyResult.maxLoan) return null;
 
-  const effectiveRate = FIXED_ANNUAL_RATE;
+  const effectiveRate = loanAmount > HIGH_LOAN_THRESHOLD ? HIGH_LOAN_RATE : FIXED_ANNUAL_RATE;
 
   const monthlyPayment = calculateMonthlyPayment(
     loanAmount,
@@ -189,7 +194,7 @@ export function simulateMortgage(
     inputs.propertyType
   );
 
-  const additionalCosts = calculateAdditionalCosts(propertyValue, loanAmount, isDFL2);
+  const additionalCosts = calculateAdditionalCosts(propertyValue, loanAmount, isSocialHousing);
 
   const monthlyPaymentCLP = monthlyPayment.total * ufValueCLP;
   const affordabilityPercentage = (monthlyPaymentCLP / monthlyIncome) * 100;

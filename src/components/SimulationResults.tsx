@@ -70,7 +70,7 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
     { concepto: 'Notaría', uf: result.additionalCosts.notaria.toFixed(2), clp: Math.round(result.additionalCosts.notaria * ufValue) },
     { concepto: 'Inscripción C.B.R.', uf: result.additionalCosts.cbr.toFixed(2), clp: Math.round(result.additionalCosts.cbr * ufValue) },
     {
-      concepto: inputs.isDFL2 ? 'Imp. Timbres (exento DFL-2)' : 'Imp. Timbres y Estampillas',
+      concepto: inputs.isSocialHousing ? 'Imp. Timbres (exento vivienda social)' : 'Imp. Timbres y Estampillas (0,2%)',
       uf: result.additionalCosts.mortgageTax.toFixed(2),
       clp: Math.round(result.additionalCosts.mortgageTax * ufValue),
     },
@@ -143,7 +143,7 @@ export default function SimulationResults({ result, ufValue, inputs }: Simulatio
             </div>
             <div className="bg-ds19-lightblue rounded p-2">
               <p className="font-semibold text-ds19-navy">% Financiamiento</p>
-              <p>{((loanAmount / propertyValue) * 100).toFixed(1)}% | DFL-2: {inputs.isDFL2 ? 'Sí' : 'No'}</p>
+              <p>{((loanAmount / propertyValue) * 100).toFixed(1)}% | Vivienda social: {inputs.isSocialHousing ? 'Sí' : 'No'}</p>
             </div>
           </div>
         </div>

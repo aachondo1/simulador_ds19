@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Calculator, Info } from 'lucide-react';
 import type { MortgageInputs } from '../types/mortgage';
-import {
-  getMinSavings,
-  DS19_TRAMOS,
-} from '../utils/mortgageCalculator';
+import { DS19_TRAMOS } from '../utils/mortgageCalculator';
+
 interface MortgageFormProps {
   onSubmit: (inputs: MortgageInputs) => void;
   minSavings?: number;
@@ -20,45 +18,34 @@ const formatCL = (value: number, isCLP: boolean): string =>
 const parseCL = (value: string): number =>
   parseFloat(value.replace(/\./g, '').replace(/,/g, '.')) || 0;
 
-export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps) {
+const noSpinner = '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
+
+export default function MortgageForm({ onSubmit }: MortgageFormProps) {
   const [inputs, setInputs] = useState<MortgageInputs>({
     propertyValue: 1800,
     savings: 280,
+    subsidy: 0,
     term: 20,
-    monthlyIncome: 2000000,
+    monthlyIncome: 0,
     age: 35,
     propertyType: 'departamento',
     hasCoDebtor: false,
-    isDFL2: true,
+    isSocialHousing: false,
     continuidadLaboral: false,
     antiguedadLaboral: false,
   });
 
-  const [fixedSalary, setFixedSalary] = useState(2000000);
+  const [fixedSalary, setFixedSalary] = useState(0);
   const [variableSalary, setVariableSalary] = useState(0);
 
   const [currency, setCurrency] = useState<'UF' | 'CLP'>('UF');
-  const [autoSavings, setAutoSavings] = useState(false);
 
   const [displayProperty, setDisplayProperty] = useState('1.800,00');
   const [displaySavings, setDisplaySavings] = useState('280,00');
+  const [displaySubsidy, setDisplaySubsidy] = useState('0,00');
   const [isPropertyFocused, setIsPropertyFocused] = useState(false);
   const [isSavingsFocused, setIsSavingsFocused] = useState(false);
-
-  useEffect(() => {
-    if (autoSavings) {
-      const min = getMinSavings(inputs.propertyValue);
-      setInputs(prev => ({ ...prev, savings: Math.round(min * 100) / 100 }));
-      if (!isSavingsFocused) {
-        const val = Math.round(min * 100) / 100;
-        setDisplaySavings(
-          currency === 'CLP'
-            ? formatCL(val * UF_REFERENCE_VALUE, true)
-            : formatCL(val, false)
-        );
-      }
-    }
-  }, [inputs.propertyValue, autoSavings, currency, isSavingsFocused]);
+  const [isSubsidyFocused, setIsSubsidyFocused] = useState(false);
 
   useEffect(() => {
     if (!isPropertyFocused) {
@@ -68,23 +55,32 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
           : formatCL(inputs.propertyValue, false)
       );
     }
-    if (!isSavingsFocused && !autoSavings) {
+    if (!isSavingsFocused) {
       setDisplaySavings(
         currency === 'CLP'
           ? formatCL(inputs.savings * UF_REFERENCE_VALUE, true)
           : formatCL(inputs.savings, false)
       );
     }
-  }, [inputs.propertyValue, inputs.savings, currency, isPropertyFocused, isSavingsFocused, autoSavings]);
+    if (!isSubsidyFocused) {
+      setDisplaySubsidy(
+        currency === 'CLP'
+          ? formatCL(inputs.subsidy * UF_REFERENCE_VALUE, true)
+          : formatCL(inputs.subsidy, false)
+      );
+    }
+  }, [inputs.propertyValue, inputs.savings, inputs.subsidy, currency, isPropertyFocused, isSavingsFocused, isSubsidyFocused]);
 
   const handleCurrencyToggle = (newCurrency: 'UF' | 'CLP') => {
     if (newCurrency === currency) return;
     if (newCurrency === 'CLP') {
       setDisplayProperty(formatCL(inputs.propertyValue * UF_REFERENCE_VALUE, true));
       setDisplaySavings(formatCL(inputs.savings * UF_REFERENCE_VALUE, true));
+      setDisplaySubsidy(formatCL(inputs.subsidy * UF_REFERENCE_VALUE, true));
     } else {
       setDisplayProperty(formatCL(inputs.propertyValue, false));
       setDisplaySavings(formatCL(inputs.savings, false));
+      setDisplaySubsidy(formatCL(inputs.subsidy, false));
     }
     setCurrency(newCurrency);
   };
@@ -103,18 +99,27 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
     setInputs(prev => ({ ...prev, savings: uf }));
   };
 
+  const handleSubsidyChange = (value: string) => {
+    setDisplaySubsidy(value);
+    const num = parseCL(value);
+    const uf = currency === 'CLP' ? num / UF_REFERENCE_VALUE : num;
+    setInputs(prev => ({ ...prev, subsidy: uf }));
+  };
+
   const monthlyIncome = fixedSalary + Math.round(variableSalary * 0.85);
+
+  const pie = inputs.savings + inputs.subsidy;
+
+  const tramoActual = DS19_TRAMOS.find(
+    t => inputs.propertyValue >= t.min && inputs.propertyValue <= t.max
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ ...inputs, monthlyIncome });
   };
 
-  const tramoActual = DS19_TRAMOS.find(
-    t => inputs.propertyValue >= t.min && inputs.propertyValue <= t.max
-  );
-  const subsidioActual = tramoActual?.subsidio ?? 0;
-  const creditoEstimado = Math.max(0, inputs.propertyValue - inputs.savings - subsidioActual);
+  const inputClass = `w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy ${noSpinner}`;
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4">
@@ -146,7 +151,7 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
       {tramoActual && (
         <div className="bg-ds19-lightblue border border-ds19-navy rounded-lg p-3">
           <p className="text-sm font-semibold text-ds19-navy">
-            📋 {tramoActual.descripcion} — Subsidio: <span className="text-ds19-green">{tramoActual.subsidio} UF</span>
+            📋 {tramoActual.descripcion} — Subsidio referencial: <span className="text-ds19-green">{tramoActual.subsidio} UF</span>
             {' '} | Ahorro mín.: {tramoActual.ahorroMin} UF
           </p>
         </div>
@@ -190,7 +195,35 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Ahorro Propio / Pie ({currency})
+            Subsidio DS19 ({currency})
+          </label>
+          <input
+            type="text"
+            value={displaySubsidy}
+            onChange={e => handleSubsidyChange(e.target.value)}
+            onFocus={() => {
+              setIsSubsidyFocused(true);
+              setDisplaySubsidy(
+                currency === 'CLP'
+                  ? Math.round(inputs.subsidy * UF_REFERENCE_VALUE).toString()
+                  : inputs.subsidy.toFixed(2).replace('.', ',')
+              );
+            }}
+            onBlur={() => {
+              setIsSubsidyFocused(false);
+              setDisplaySubsidy(
+                currency === 'CLP'
+                  ? formatCL(inputs.subsidy * UF_REFERENCE_VALUE, true)
+                  : formatCL(inputs.subsidy, false)
+              );
+            }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Ahorro Propio ({currency})
           </label>
           <input
             type="text"
@@ -212,38 +245,22 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
                   : formatCL(inputs.savings, false)
               );
             }}
-            disabled={autoSavings}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy disabled:bg-gray-100"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
             required
           />
-          <label className="flex items-center gap-2 cursor-pointer mt-2">
-            <input
-              type="checkbox"
-              checked={autoSavings}
-              onChange={e => setAutoSavings(e.target.checked)}
-              className="w-4 h-4 rounded"
-            />
-            <span className="text-xs text-gray-700">Calcular automáticamente (mínimo para 80% financiamiento)</span>
-          </label>
+        </div>
 
-          {autoSavings && (
-            <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
-              <p className="font-medium">Crédito estimado: {creditoEstimado.toFixed(2)} UF</p>
-              <p>
-                Ahorro ({inputs.savings.toFixed(2)} UF) + Subsidio ({subsidioActual.toFixed(2)} UF)
-                = {(inputs.savings + subsidioActual).toFixed(2)} UF
-                ({(((inputs.savings + subsidioActual) / inputs.propertyValue) * 100).toFixed(1)}%)
-              </p>
-            </div>
-          )}
-
-          {!autoSavings && minSavings !== undefined && (
-            <p className="text-xs text-gray-500 mt-1">
-              Mínimo requerido: {currency === 'CLP'
-                ? `${(minSavings * UF_REFERENCE_VALUE).toLocaleString('es-CL')} CLP`
-                : `${minSavings.toFixed(2)} UF`}
-            </p>
-          )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Pie Total (Subsidio + Ahorro)</label>
+          <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-ds19-lightblue text-ds19-navy font-semibold text-sm select-none">
+            {currency === 'CLP'
+              ? `${formatCL(pie * UF_REFERENCE_VALUE, true)} CLP`
+              : `${formatCL(pie, false)} UF`}
+            {' '}
+            <span className="font-normal text-xs text-gray-600">
+              ({pie.toFixed(2)} UF / {formatCL(pie * UF_REFERENCE_VALUE, true)} CLP)
+            </span>
+          </div>
         </div>
 
         <div>
@@ -253,8 +270,11 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
             min="5"
             max="40"
             value={inputs.term}
-            onChange={e => setInputs(prev => ({ ...prev, term: parseInt(e.target.value) || 20 }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+            onChange={e => {
+              const val = parseInt(e.target.value) || 20;
+              setInputs(prev => ({ ...prev, term: Math.min(val, 40) }));
+            }}
+            className={inputClass}
             required
           />
         </div>
@@ -265,9 +285,10 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
             type="number"
             step="1"
             min="0"
-            value={fixedSalary}
+            value={fixedSalary || ''}
+            placeholder="0"
             onChange={e => setFixedSalary(parseFloat(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+            className={inputClass}
             required
           />
         </div>
@@ -278,9 +299,10 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
             type="number"
             step="1"
             min="0"
-            value={variableSalary}
+            value={variableSalary || ''}
+            placeholder="0"
             onChange={e => setVariableSalary(parseFloat(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+            className={inputClass}
           />
           <p className="text-xs text-gray-500 mt-1">Se considera el 85% (penalización 15%)</p>
           <div className="mt-2 p-2 bg-ds19-lightblue border border-ds19-navy rounded text-xs text-ds19-navy">
@@ -299,7 +321,7 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
             onChange={e =>
               setInputs(prev => ({ ...prev, age: parseInt(e.target.value) || 35 }))
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ds19-navy"
+            className={inputClass}
             required
           />
         </div>
@@ -367,19 +389,19 @@ export default function MortgageForm({ onSubmit, minSavings }: MortgageFormProps
             <div className="relative">
               <input
                 type="checkbox"
-                checked={inputs.isDFL2}
-                onChange={e => setInputs(prev => ({ ...prev, isDFL2: e.target.checked }))}
+                checked={inputs.isSocialHousing}
+                onChange={e => setInputs(prev => ({ ...prev, isSocialHousing: e.target.checked }))}
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-ds19-navy transition-colors"></div>
               <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
             </div>
-            <span className="text-sm font-medium text-gray-700">Primera Vivienda DFL-2</span>
+            <span className="text-sm font-medium text-gray-700">¿Es Vivienda Social?</span>
           </label>
           <p className="text-xs text-gray-500 mt-1 ml-14">
-            {inputs.isDFL2
-              ? '✅ Exento de Impuesto de Timbres (0.8%)'
-              : '⚠️ Aplica Impuesto de Timbres sobre el crédito'}
+            {inputs.isSocialHousing
+              ? '✅ Exenta de Imp. Timbres (0%)'
+              : '⚠️ Imp. Timbres y Estampillas: 0,2% del crédito'}
           </p>
         </div>
 

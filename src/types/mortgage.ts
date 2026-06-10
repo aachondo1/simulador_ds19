@@ -1,12 +1,13 @@
 export interface MortgageInputs {
   propertyValue: number;        // Valor propiedad en UF
-  savings: number;              // Ahorro propio (pie) en UF
+  savings: number;              // Ahorro propio en UF
+  subsidy: number;              // Subsidio DS19 en UF (ingresado manualmente)
   term: number;                 // Plazo en años
   monthlyIncome: number;        // Renta declarada mensual en CLP
   age: number;                  // Edad del solicitante
   propertyType: 'casa' | 'departamento' | 'otro';
   hasCoDebtor: boolean;         // ¿Presenta codeudor?
-  isDFL2: boolean;              // ¿Primera vivienda DFL-2? (exento impuesto timbres)
+  isSocialHousing: boolean;     // ¿Es vivienda social? (exento impuesto timbres)
   continuidadLaboral: boolean;  // true = ≥ 6 meses con el mismo empleador
   antiguedadLaboral: boolean;   // true = ≥ 12 meses trabajando
 }

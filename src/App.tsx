@@ -4,7 +4,7 @@ import MortgageForm from './components/MortgageForm';
 import SimulationResults from './components/SimulationResults';
 import Glossary from './components/Glossary';
 import Disclaimer from './components/Disclaimer';
-import { simulateMortgage, calculateSubsidyResult } from './utils/mortgageCalculator';
+import { simulateMortgage } from './utils/mortgageCalculator';
 import { getUFValue } from './services/ufService';
 import { obtenerFechaHoy } from './services/fechaService';
 import type { MortgageInputs, SimulationResult } from './types/mortgage';
@@ -13,19 +13,11 @@ function App() {
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [inputs, setInputs] = useState<MortgageInputs | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [minSavings, setMinSavings] = useState<number | undefined>();
   const [ufValue, setUfValue] = useState(39500);
 
   useEffect(() => {
     getUFValue().then(setUfValue);
   }, []);
-
-  useEffect(() => {
-    if (inputs) {
-      const subsidyInfo = calculateSubsidyResult(inputs.propertyValue);
-      setMinSavings(subsidyInfo.minSavings);
-    }
-  }, [inputs]);
 
   const handleSimulation = (newInputs: MortgageInputs) => {
     setInputs(newInputs);
@@ -81,7 +73,7 @@ function App() {
           <>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               <div className="lg:col-span-2">
-                <MortgageForm onSubmit={handleSimulation} minSavings={minSavings} />
+                <MortgageForm onSubmit={handleSimulation}  />
               </div>
               <div>
                 <Glossary />
@@ -92,7 +84,7 @@ function App() {
         ) : (
           <>
             <div className="mb-6">
-              <MortgageForm onSubmit={handleSimulation} minSavings={minSavings} />
+              <MortgageForm onSubmit={handleSimulation}  />
             </div>
 
             {error && (
